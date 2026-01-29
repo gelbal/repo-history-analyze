@@ -11,6 +11,14 @@ dependencies = [
 [project.scripts]
 repo-analyzer = "repo_analyzer.cli:main"
 
+[project.optional-dependencies]
+viz = [
+    "marimo>=0.10.0",
+    "plotly>=5.18.0",
+    "pandas>=2.0.0",
+    "kaleido>=0.2.1",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",

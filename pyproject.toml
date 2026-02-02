@@ -1,7 +1,7 @@
 [project]
 name = "repo-history-analyze"
 version = "0.1.0"
-description = "Analyze git repository history and generate statistical reports"
+description = "Analyze git and SVN repository history and generate statistical reports"
 requires-python = ">=3.11"
 dependencies = [
     "gitpython>=3.1.45",
@@ -10,6 +10,7 @@ dependencies = [
 
 [project.scripts]
 repo-analyzer = "repo_analyzer.cli:main"
+svn-analyzer = "repo_analyzer.svn.cli:main"
 
 [project.optional-dependencies]
 viz = [

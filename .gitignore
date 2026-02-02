@@ -23,3 +23,7 @@ htmlcov/
 # Project Data
 cache/
 data/
+
+# Local notebooks (not committed)
+src/notebooks/chart_iterations.py
+src/notebooks/wordpress_props_contributors.py

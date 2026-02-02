@@ -1,114 +1,95 @@
-# Git Repository History Analyzer
+# WordPress SVN Repository Analyzer
 
-Analyzes git repository history and generates CSV reports with per-commit metadata and weekly aggregates. Uses WordPress as the default example, but works with any git repository.
+Analyzes WordPress core SVN repository history and generates statistical reports. Tracks contributors via the `Props` tag in commit messages, line changes, and development activity over WordPress's 20+ year history.
 
-## Quick Start (WordPress Example)
+## Features
+
+- **Props Tracking**: Extract contributor credits from WordPress commit messages
+- **Line Change Analysis**: Track additions, deletions, and net code growth
+- **Rolling Windows**: 12-week (quarterly) aggregations for trend analysis
+- **Diff Caching**: Efficient fetching with persistent cache for large analysis runs
+- **Interactive Visualization**: Marimo notebook with iterative chart design
+
+## Quick Start
 
 ```bash
 # Install dependencies
 make setup
 
-# Run full 20-year WordPress analysis (2005-2025)
-make analyze
+# Run SVN analysis (2003-2025)
+make analyze-svn
 
-# Or analyze a specific date range
-uv run python -m repo_analyzer --since 2024-01-01 --to 2024-12-31
+# Launch visualization notebook
+make notebook NOTEBOOK=wordpress_code_evolution.py
 ```
 
-## Analyzing Other Repositories
+## Visualization Notebook
+
+The `wordpress_code_evolution.py` notebook demonstrates AI-assisted chart design through 6 iterations:
+
+- **Iteration 0**: Raw weekly data (Plotly defaults)
+- **Iteration 1**: Rolling data with Plotly defaults
+- **Iteration 2**: Decluttered with semantic colors
+- **Iteration 3**: WordPress brand colors + peak annotations
+- **Iteration 4**: Three-panel layout with area fills
+- **Iteration 5**: Full storytelling with milestones
 
 ```bash
-# Analyze Linux kernel
-uv run python -m repo_analyzer \
-  --since 2024-01-01 \
-  --to 2024-12-31 \
-  --repo-url https://github.com/torvalds/linux.git
+# Edit notebook
+make notebook NOTEBOOK=wordpress_code_evolution.py
 
-# Analyze React with custom name
-uv run python -m repo_analyzer \
-  --since 2023-01-01 \
-  --to 2023-12-31 \
-  --repo-url https://github.com/facebook/react.git \
-  --repo-name react-2023
+# View notebook (read-only)
+make notebook-run NOTEBOOK=wordpress_code_evolution.py
 
-# Analyze any repository with custom directories
-uv run python -m repo_analyzer \
-  --since 2024-01-01 \
-  --to 2024-12-31 \
-  --repo-url https://github.com/microsoft/vscode.git \
-  --output-dir ./my_analysis \
-  --cache-dir ./my_cache
+# Export charts
+uv run marimo run src/notebooks/wordpress_code_evolution.py
+# Then uncomment export_charts() in the notebook
 ```
-
-## Usage
-
-```bash
-# Analyze specific date ranges (WordPress default)
-uv run python -m repo_analyzer --since 2005-04-01 --to 2005-04-30
-
-# Custom output directory
-uv run python -m repo_analyzer \
-  --since 2024-01-01 \
-  --to 2024-12-31 \
-  --output-dir ./my_analysis \
-  --cache-dir ./my_cache
-```
-
-**Options:**
-- `--since DATE` - Start date (YYYY-MM-DD, required)
-- `--to DATE` - End date (YYYY-MM-DD, required)
-- `--repo-url URL` - Git repository URL to analyze (default: WordPress repository)
-- `--repo-name NAME` - Repository name for output organization (default: inferred from URL or 'WordPress')
-- `--cache-dir DIR` - Repository cache directory (default: ./cache)
-- `--output-dir DIR` - Output directory (default: ./data)
 
 ## Output Files
 
 ```
-data/WordPress/
-├── 2005/commits.csv                   # Per-commit data for 2005
-├── 2006/commits.csv                   # Per-commit data for 2006
-...
-├── 2026/commits.csv                   # Per-commit data for 2026
-├── weekly_aggregates.csv              # Weekly statistics (all years)
-└── rolling_window_aggregates.csv      # 12-week rolling windows
+data/svn/
+├── commits/                      # Per-year commit data
+│   ├── 2003/commits.csv
+│   ├── 2004/commits.csv
+│   └── ...
+├── marimo/                       # Aggregated data for visualization
+│   ├── weekly_stats.csv          # Weekly statistics
+│   ├── rolling_12week_stats.csv  # 12-week rolling windows
+│   └── contributor_lifetimes.csv # Contributor first/last activity
+└── contributor_stats.csv         # All-time contributor statistics
 ```
 
-**commits.csv** - Per-commit metadata:
-- `hash`, `author_name`, `commit_date`, `lines_added`, `lines_deleted`, `version`
+### Data Schema
 
-**weekly_aggregates.csv** - Weekly statistics (ISO calendar weeks):
-- `week_start`, `total_commits`, `unique_authors`, `total_lines_added`, `total_lines_deleted`, `versions_released`
+**weekly_stats.csv** - Per-week statistics:
+- `date`, `year`, `week`, `total_commits`, `unique_authors`
+- `unique_props_contributors`, `total_lines_added`, `total_lines_deleted`
 
-**rolling_window_aggregates.csv** - 12-week rolling window statistics:
-- `window_start`, `window_end`, `total_commits`, `unique_authors`, `total_lines_added`, `total_lines_deleted`, `versions_released`
-- Authors and versions deduplicated across entire 12-week period
-- One row per week (overlapping windows)
-- Windows at end of date range may contain < 12 weeks
+**rolling_12week_stats.csv** - Quarterly rolling windows:
+- Same fields, with contributors deduplicated across 12-week periods
+- Smooths weekly noise to reveal sustained activity trends
 
 ## Development
 
 ```bash
-# Run tests (excluding slow E2E tests)
+# Run tests
 make test
 
-# Run all tests
+# Run all tests (including slow E2E)
 make test-all
 
-# Run linter
+# Lint code
 make lint
 
 # Clean generated data
 make clean
-
-# Show all commands
-make help
 ```
 
 ## Notes
 
-- First run clones the specified repository (size and time varies by repository)
-- Subsequent runs use cached repository
+- SVN diffs are cached to avoid repeated fetches
+- First full run (2003-2025) fetches ~60K commits and their diffs
+- Props tags follow WordPress convention: `Props @username, @username2.`
 - Uses ISO 8601 week boundaries (Monday start)
-- Version numbers extracted from git tags (numeric patterns only)
-- WordPress repository (~500MB, 5-10 min for first clone)

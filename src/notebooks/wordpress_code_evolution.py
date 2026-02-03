@@ -798,29 +798,41 @@ def _(df, go, make_subplots):
 
     # Key WordPress milestones with vertical lines and annotations
     _milestones = [
+        ("2005-02-17", "WP 1.5\nThemes"),
         ("2010-06-17", "WP 3.0\nMultisite"),
         ("2018-12-06", "Gutenberg\n(WP 5.0)"),
         ("2022-05-24", "WP 6.0\nFSE"),
     ]
 
+    # Calculate bounds for partial vertical lines (shorter than full height)
+    _max_contrib = df["unique_props_contributors"].max()
+    _max_lines = max(df["total_lines_added"].max(), df["total_lines_deleted"].max())
+    _max_net = df["net_lines"].max()
+    _min_net = df["net_lines"].min()
+
     for _date_str, _label in _milestones:
-        # Vertical line on all charts
-        fig5.add_vline(
-            x=_date_str, line=dict(color=WP_DARK_GRAY_5, width=1, dash="dot"),
+        # Shorter vertical lines using shapes
+        fig5.add_shape(
+            type="line", x0=_date_str, x1=_date_str,
+            y0=0, y1=_max_contrib * 0.85,
+            line=dict(color=WP_DARK_GRAY_5, width=1, dash="dot"),
             row=1, col=1
         )
-        fig5.add_vline(
-            x=_date_str, line=dict(color=WP_DARK_GRAY_5, width=1, dash="dot"),
+        fig5.add_shape(
+            type="line", x0=_date_str, x1=_date_str,
+            y0=0, y1=_max_lines * 0.85,
+            line=dict(color=WP_DARK_GRAY_5, width=1, dash="dot"),
             row=2, col=1
         )
-        fig5.add_vline(
-            x=_date_str, line=dict(color=WP_DARK_GRAY_5, width=1, dash="dot"),
+        fig5.add_shape(
+            type="line", x0=_date_str, x1=_date_str,
+            y0=_min_net * 1.2, y1=_max_net * 0.85,
+            line=dict(color=WP_DARK_GRAY_5, width=1, dash="dot"),
             row=3, col=1
         )
         # Annotation only on row 1
-        _y_max = df["unique_props_contributors"].max()
         fig5.add_annotation(
-            x=_date_str, y=_y_max * 0.95,
+            x=_date_str, y=_max_contrib * 0.95,
             text=_label,
             showarrow=False,
             font=dict(size=13, color=WP_DARK_GRAY_5),
@@ -884,10 +896,10 @@ def _(df, go, make_subplots):
     # (date, value, yshift, xshift)
     _net_peaks_5 = [
         ("2005-04-18", 196637, 20, 0),     # WP 1.5 release
-        ("2017-12-18", -38622, -28, 0),    # Post WP 4.9 cleanup
+        ("2017-12-18", -38622, -28, 3),    # Post WP 4.9 cleanup
         ("2018-10-08", 117674, 20, 0),     # WP 5.0 Gutenberg push
         ("2020-09-28", 112182, 20, 0),   # WP 5.5/5.6 development
-        ("2021-02-15", -18864, -24, 0),     # Post 5.7 refactoring
+        ("2021-02-15", -18864, -14, 0),     # Post 5.7 refactoring
         ("2023-08-07", 101879, 20, 0),   # WP 6.3 FSE maturity
         ("2024-10-07", -16242, -20, 0),     # WP 6.7 cleanup
     ]
@@ -901,6 +913,26 @@ def _(df, go, make_subplots):
             font=dict(color=WP_ORIENT_5, size=17, weight="bold"),
             row=3, col=1
         )
+
+    # Contextual labels with arrows for major negative peaks
+    fig5.add_annotation(
+        x="2017-12-18", y=-38622,
+        text="Post WP 4.9\ncleanup",
+        showarrow=True,
+        arrowhead=0,
+        ax=-80, ay=20,
+        font=dict(color=WP_ORIENT_5, size=12),
+        row=3, col=1
+    )
+    fig5.add_annotation(
+        x="2021-02-15", y=-18864,
+        text="Post 5.7\nrefactoring",
+        showarrow=True,
+        arrowhead=0,
+        ax=60, ay=35,
+        font=dict(color=WP_ORIENT_5, size=12),
+        row=3, col=1
+    )
 
     # Layout with insight-driven title - left aligned
     fig5.update_layout(
@@ -917,7 +949,7 @@ def _(df, go, make_subplots):
             x=0, xanchor="left",
             font=dict(size=26, color=WP_DARK_GRAY_5)
         ),
-        margin=dict(r=120, l=60, t=100)
+        margin=dict(r=120, l=60, t=100, b=60)
     )
 
     # Axes styling - use ~s to avoid "0.0"
@@ -1042,7 +1074,7 @@ def _(NOTEBOOK_DIR, fig0, fig1, fig2, fig3, fig4, fig5):
         return exported_files
 
     # Uncomment the line below to export charts:
-    # export_charts()
+    export_charts()
     return
 
 

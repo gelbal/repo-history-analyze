@@ -10,7 +10,7 @@ setup:  ## Install dependencies (including viz extras)
 	uv sync --all-groups --all-extras
 
 analyze:  ## Run full SVN analysis (2003 through 2025)
-	uv run python -m repo_analyzer.svn.cli --since 2003-04-01 --to 2025-12-31
+	uv run python -m repo_analyzer.svn.cli --since 2003-04-01 --to 2025-12-31 --fetch-diffs
 
 test:  ## Run all tests (excluding slow E2E tests)
 	uv run pytest -v -m "not slow"

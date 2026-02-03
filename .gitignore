@@ -22,7 +22,11 @@ htmlcov/
 
 # Project Data
 cache/
+.cache/
 data/
+
+# Ruff
+.ruff_cache/
 
 # Local notebooks (not committed)
 src/notebooks/chart_iterations.py

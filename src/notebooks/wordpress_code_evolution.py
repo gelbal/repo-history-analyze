@@ -54,8 +54,7 @@ def _():
 
     # Compute paths relative to this notebook's location
     NOTEBOOK_DIR = Path(__file__).parent.resolve()
-    PROJECT_ROOT = NOTEBOOK_DIR.parent.parent  # src/notebooks -> src -> project root
-    DATA_DIR = PROJECT_ROOT / "data" / "svn" / "marimo"
+    DATA_DIR = NOTEBOOK_DIR / "data"
     return DATA_DIR, NOTEBOOK_DIR, go, make_subplots, pd
 
 

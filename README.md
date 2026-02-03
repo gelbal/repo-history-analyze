@@ -16,11 +16,11 @@ Analyzes WordPress core SVN repository history and generates statistical reports
 # Install dependencies
 make setup
 
-# Run SVN analysis (2003-2025)
-make analyze-svn
+# Launch visualization notebook (works immediately with bundled sample data)
+make notebook
 
-# Launch visualization notebook
-make notebook NOTEBOOK=wordpress_code_evolution.py
+# Run full SVN analysis to update data (2003-2025, takes time)
+make analyze
 ```
 
 ## Visualization Notebook
@@ -35,31 +35,37 @@ The `wordpress_code_evolution.py` notebook demonstrates AI-assisted chart design
 - **Iteration 5**: Full storytelling with milestones
 
 ```bash
-# Edit notebook
-make notebook NOTEBOOK=wordpress_code_evolution.py
+# Edit notebook (default: wordpress_code_evolution.py)
+make notebook
 
 # View notebook (read-only)
-make notebook-run NOTEBOOK=wordpress_code_evolution.py
+make notebook-run
 
-# Export charts
-uv run marimo run src/notebooks/wordpress_code_evolution.py
-# Then uncomment export_charts() in the notebook
+# Export charts as PNG
+make export-charts
 ```
 
 ## Output Files
 
+The analysis produces two output locations:
+
+**Raw analysis data** (`data/svn/`, gitignored):
 ```
 data/svn/
-├── commits/                      # Per-year commit data
-│   ├── 2003/commits.csv
-│   ├── 2004/commits.csv
-│   └── ...
-├── marimo/                       # Aggregated data for visualization
-│   ├── weekly_stats.csv          # Weekly statistics
-│   ├── rolling_12week_stats.csv  # 12-week rolling windows
-│   └── contributor_lifetimes.csv # Contributor first/last activity
-└── contributor_stats.csv         # All-time contributor statistics
+├── YYYY/commits.csv              # Per-year commit data
+├── weekly_aggregates.csv         # Weekly statistics (raw format)
+├── rolling_window_aggregates.csv # 12-week rolling windows (raw format)
+└── contributor_lifetimes.csv     # Contributor first/last activity
 ```
+
+**Notebook data** (`src/notebooks/data/`, committed):
+```
+src/notebooks/data/
+├── weekly_stats.csv              # Weekly statistics (notebook-friendly)
+└── rolling_12week_stats.csv      # 12-week rolling windows (notebook-friendly)
+```
+
+The notebook data directory contains sample data that is committed to the repository, so users can run the visualization notebook immediately without running the full analysis first. Running `make analyze` updates these files with fresh data.
 
 ### Data Schema
 

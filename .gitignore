@@ -20,10 +20,10 @@ htmlcov/
 .conductor/
 .cursorindexingignore
 
-# Project Data
-cache/
-.cache/
-data/
+# Project Data (root level only)
+/cache/
+/.cache/
+/data/
 
 # Ruff
 .ruff_cache/

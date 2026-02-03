@@ -338,28 +338,25 @@ def main() -> None:
         logger.info(f"Writing contributor lifetimes to {contributors_path}...")
         SVNCSVWriter.write_contributor_stats(contributor_stats, contributors_path)
 
-        # Write marimo-friendly CSV files (simpler date format, year/week columns)
-        marimo_dir = svn_output_dir / "marimo"
-        marimo_dir.mkdir(parents=True, exist_ok=True)
+        # Write notebook-friendly CSV files (simpler date format, year/week columns)
+        # These are written to src/notebooks/data/ for use by Marimo notebooks
+        notebook_data_dir = Path(__file__).parent.parent.parent / "notebooks" / "data"
+        notebook_data_dir.mkdir(parents=True, exist_ok=True)
 
-        weekly_marimo_path = marimo_dir / "weekly_stats.csv"
-        logger.info(f"Writing marimo-friendly weekly stats to {weekly_marimo_path}...")
-        SVNCSVWriter.write_weekly_aggregates_marimo(weekly_aggregates, weekly_marimo_path)
+        weekly_notebook_path = notebook_data_dir / "weekly_stats.csv"
+        logger.info(f"Writing notebook-friendly weekly stats to {weekly_notebook_path}...")
+        SVNCSVWriter.write_weekly_aggregates_marimo(weekly_aggregates, weekly_notebook_path)
 
-        rolling_marimo_path = marimo_dir / "rolling_12week_stats.csv"
-        logger.info(f"Writing marimo-friendly rolling window stats to {rolling_marimo_path}...")
-        SVNCSVWriter.write_rolling_aggregates_marimo(rolling_windows, rolling_marimo_path)
-
-        contributors_marimo_path = marimo_dir / "contributor_lifetimes.csv"
-        logger.info(f"Writing marimo-friendly contributor stats to {contributors_marimo_path}...")
-        SVNCSVWriter.write_contributor_stats_marimo(contributor_stats, contributors_marimo_path)
+        rolling_notebook_path = notebook_data_dir / "rolling_12week_stats.csv"
+        logger.info(f"Writing notebook-friendly rolling window stats to {rolling_notebook_path}...")
+        SVNCSVWriter.write_rolling_aggregates_marimo(rolling_windows, rolling_notebook_path)
 
         logger.info("Analysis complete!")
         logger.info(f"  Commits by year: {args.output_dir}/svn/YYYY/commits.csv")
         logger.info(f"  Weekly aggregates: {weekly_path}")
         logger.info(f"  Rolling windows: {rolling_path}")
         logger.info(f"  Contributor lifetimes: {contributors_path}")
-        logger.info(f"  Marimo-ready files: {marimo_dir}/")
+        logger.info(f"  Notebook data: {notebook_data_dir}/")
 
     except ValueError as e:
         logger.error(f"Invalid input: {e}")
